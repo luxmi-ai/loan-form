@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Microfinance Collection Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <div class="max-w-3xl mx-auto mt-10 p-6 bg-white rounded shadow relative">
+    <div id="formContainer" class="transition-all duration-500 ease-in-out"></div>
+
+    <div class="mt-6 flex justify-between">
+      <button id="prevBtn" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Previous</button>
+      <button id="nextBtn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Next</button>
+    </div>
+  </div>
+
+  <script>
+    const groupName = "TU'ATAKILANGI - T1";
+
+    const people = [
+      {
+        memberNumber: "1001000033554",
+        name: "TEMALETI HAKALO",
+        loans: [
+          {
+            loanAmount: "2,500",
+            loanStartDate: "03/30/2026",
+            outstandingBalance: "2,474.50",
+            arrears: "(55.60)",
+            weeklyPayment: "59.05",
+            dueThisWeek: "53.45",
+          },
+          {
+            loanAmount: "1,500",
+            loanStartDate: "01/15/2026",
+            outstandingBalance: "1,210.00",
+            arrears: "(20.00)",
+            weeklyPayment: "40.00",
+            dueThisWeek: "35.00",
+          }
+        ]
+      },
+      {
+        memberNumber: "1002000198671",
+        name: "SEINI MATEITALO LO",
+        loans: [
+          {
+            loanAmount: "2,500",
+            loanStartDate: "04/06/2026",
+            outstandingBalance: "2,397.00",
+            arrears: "(66.84)",
+            weeklyPayment: "38.04",
+            dueThisWeek: "21.70",
+          }
+        ]
+      }
+    ];
+
+    let currentIndex = 0;
+    const formContainer = document.getElementById("formContainer");
+
+    function renderForm(index) {
+      const p = people[index];
+
+      const loanHeader = `
+        <table class="w-full text-sm text-left text-gray-700 border border-gray-300 mb-4">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="px-3 py-2 border">Loan #</th>
+              <th class="px-3 py-2 border">Outstanding</th>
+              <th class="px-3 py-2 border">Arrears</th>
+              <th class="px-3 py-2 border">Weekly</th>
+              <th class="px-3 py-2 border">Due</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${p.loans.map((loan, i) => `
+              <tr>
+                <td class="px-3 py-2 border">Loan ${i + 1}</td>
+                <td class="px-3 py-2 border">${loan.outstandingBalance}</td>
+                <td class="px-3 py-2 border">${loan.arrears}</td>
+                <td class="px-3 py-2 border">${loan.weeklyPayment}</td>
+                <td class="px-3 py-2 border">${loan.dueThisWeek || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+
+      let loanForms = p.loans.map((loan, i) => `
+        <div class="w-full md:w-1/2 px-2">
+          <div class="text-lg font-semibold mb-2">Loan ${i + 1}</div>
+          <div class="mb-2">Loan Amount: <span class="font-semibold">${loan.loanAmount}</span></div>
+          <div class="mb-2">Loan Start Date: <span class="font-semibold">${loan.loanStartDate}</span></div>
+
+          <div class="mb-4">
+            <label class="block font-medium">Cash Loan Payment</label>
+            <input type="number" class="w-full border p-2 rounded mt-1 loan-input" data-index="${i}" placeholder="Enter amount" />
+          </div>
+
+          <div class="mb-4">
+            <label class="block font-medium">Cash Savings Collected</label>
+            <input type="number" class="w-full border p-2 rounded mt-1" placeholder="Enter amount" />
+          </div>
+
+          <div class="mb-4">
+            <label class="block font-medium">Total Cash Collection</label>
+            <input type="number" class="w-full border p-2 rounded mt-1 total-input" data-index="${i}" placeholder="Auto or manual" />
+          </div>
+
+          <div class="mb-4">
+            <label class="block font-medium">Payment Source (Select)</label>
+            <select class="w-full border p-2 rounded mt-1">
+              <option value="">Select</option>
+              <option value="Individual">Individual</option>
+              <option value="Group">Group</option>
+              <option value="Centre">Centre</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="block font-medium">Payment Source (Radio)</label>
+            <div class="flex space-x-4 mt-1">
+              <label><input type="radio" name="payment-${i}" value="Individual" class="mr-1">Individual</label>
+              <label><input type="radio" name="payment-${i}" value="Group" class="mr-1">Group</label>
+              <label><input type="radio" name="payment-${i}" value="Centre" class="mr-1">Centre</label>
+            </div>
+          </div>
+
+        </div>
+      `).join('');
+
+      formContainer.innerHTML = `
+        <div class="animate-fadeIn">
+          <div class="text-sm text-gray-600 mb-1">Group: <span class="font-bold">${groupName}</span></div>
+          <h2 class="text-xl font-bold mb-4">${p.name}</h2>
+          ${loanHeader}
+          <div class="flex flex-wrap -mx-2">
+            ${loanForms}
+          </div>
+          <div class="mt-4 text-lg font-semibold">Total to Collect: <span id="totalCollect" class="text-blue-600">0</span></div>
+        </div>
+      `;
+
+      document.querySelectorAll('.total-input').forEach(input => {
+        input.addEventListener('input', updateTotalCollect);
+      });
+    }
+
+    function updateTotalCollect() {
+      const totals = document.querySelectorAll('.total-input');
+      let sum = 0;
+      totals.forEach(input => {
+        const val = parseFloat(input.value);
+        if (!isNaN(val)) sum += val;
+      });
+      document.getElementById("totalCollect").textContent = sum.toFixed(2);
+    }
+
+    document.getElementById("prevBtn").addEventListener("click", () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderForm(currentIndex);
+      }
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      if (currentIndex < people.length - 1) {
+        currentIndex++;
+        renderForm(currentIndex);
+      }
+    });
+
+    renderForm(currentIndex);
+  </script>
+</body>
+</html>
