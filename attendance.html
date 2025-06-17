@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Group Attendance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+
+  <div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
+    <h1 class="text-2xl font-bold mb-6">Attendance Sheet</h1>
+
+    <!-- Loop through groups -->
+    <div id="attendanceForm">
+      <!-- Example group -->
+    </div>
+
+    <button class="mt-6 w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Submit Attendance</button>
+  </div>
+
+  <script>
+    const groups = [
+      {
+        groupName: "Group A - Tu'atakilangi",
+        members: ["Temaleti Hakalo", "Seini Mateitalo", "Takina Pupu"]
+      },
+      {
+        groupName: "Group B - Nuku'alofa",
+        members: ["Mele Fine", "Sesimani Ahoelelei", "Katalina Satini"]
+      }
+    ];
+
+    const formContainer = document.getElementById("attendanceForm");
+
+    groups.forEach((group, groupIndex) => {
+      const groupBlock = document.createElement("div");
+      groupBlock.classList.add("mb-8");
+
+      groupBlock.innerHTML = `
+        <h2 class="text-lg font-semibold mb-4">${group.groupName}</h2>
+        <div class="space-y-4">
+          ${group.members.map((member, memberIndex) => `
+            <div class="flex flex-col md:flex-row md:items-center justify-between border-b pb-2">
+              <span class="font-medium">${member}</span>
+              <div class="flex space-x-4 mt-2 md:mt-0">
+                <label class="inline-flex items-center">
+                  <input type="radio" name="attendance-${groupIndex}-${memberIndex}" value="present" class="mr-1">
+                  Present
+                </label>
+                <label class="inline-flex items-center">
+                  <input type="radio" name="attendance-${groupIndex}-${memberIndex}" value="absent" class="mr-1">
+                  Absent
+                </label>
+                <label class="inline-flex items-center">
+                  <input type="radio" name="attendance-${groupIndex}-${memberIndex}" value="late" class="mr-1">
+                  Late
+                </label>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+
+      formContainer.appendChild(groupBlock);
+    });
+  </script>
+
+</body>
+</html>
