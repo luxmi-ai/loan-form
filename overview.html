@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Centre Overview</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6 text-gray-800">
+  <div class="max-w-7xl mx-auto bg-white p-6 rounded shadow">
+    <h1 class="text-2xl font-bold mb-6">Centre Billing Overview - TU'ATAKILANGI</h1>
+
+    <div class="mb-6">
+      <label class="block font-medium mb-1">Centre Savings</label>
+      <input type="number" class="w-full border p-2 rounded" placeholder="Enter centre savings" />
+    </div>
+
+    <div id="groupsContainer" class="space-y-4"></div>
+  </div>
+
+  <script>
+    const centerData = {
+      name: "TU'ATAKILANGI",
+      groups: [
+        {
+          name: "Group A",
+          groupSavings: 0,
+          members: [
+            {
+              name: "Temaleti Hakalo",
+              attendance: "Present",
+              booklet: "New",
+              loans: [
+                {
+                  number: 1,
+                  amount: 2500,
+                  startDate: "03/30/2026",
+                  outstanding: 2474.5,
+                  arrears: -55.6,
+                  weekly: 59.05,
+                  due: 53.45,
+                  loanCollected: 460,
+                  savings: 140,
+                  total: 600,
+                  source: "Individual"
+                },
+                {
+                  number: 2,
+                  amount: 1500,
+                  startDate: "01/15/2026",
+                  outstanding: 1210,
+                  arrears: -20,
+                  weekly: 40,
+                  due: 35,
+                  loanCollected: 250,
+                  savings: 50,
+                  total: 300,
+                  source: "Group"
+                }
+              ]
+            },
+            {
+              name: "Seini Mateitalo",
+              attendance: "Absent",
+              booklet: "Existing",
+              loans: [
+                {
+                  number: 1,
+                  amount: 2500,
+                  startDate: "04/06/2026",
+                  outstanding: 2397,
+                  arrears: -66.84,
+                  weekly: 38.04,
+                  due: 21.7,
+                  loanCollected: 700,
+                  savings: 70,
+                  total: 770,
+                  source: "Centre"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          name: "Group B",
+          groupSavings: 0,
+          members: [
+            {
+              name: "Mele Fine",
+              attendance: "Late",
+              booklet: "New",
+              loans: [
+                {
+                  number: 1,
+                  amount: 1050,
+                  startDate: "08/04/2025",
+                  outstanding: 163,
+                  arrears: -35.4,
+                  weekly: 24.8,
+                  due: 20,
+                  loanCollected: 200,
+                  savings: 30,
+                  total: 230,
+                  source: "Individual"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+
+    const container = document.getElementById("groupsContainer");
+
+    centerData.groups.forEach((group, groupIdx) => {
+      const totalCollected = group.members.reduce((sum, member) => {
+        return sum + member.loans.reduce((acc, loan) => acc + loan.total, 0);
+      }, 0);
+
+      const groupId = `group-${groupIdx}`;
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "border rounded shadow";
+      wrapper.innerHTML = `
+        <button class="w-full flex justify-between items-center bg-gray-100 px-4 py-3 font-semibold" onclick="document.getElementById('${groupId}').classList.toggle('hidden')">
+          <span>${group.name}</span>
+          <span>Total Collected: ${totalCollected}</span>
+        </button>
+        <div class="px-4 py-3 bg-white" id="${groupId}">
+          <div class="mb-4">
+            <label class="font-medium mr-2">Group Savings:</label>
+            <input type="number" class="border p-2 rounded" placeholder="Enter group savings" />
+          </div>
+          <table class="w-full text-sm text-left border">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="border px-2 py-1">Member</th>
+                <th class="border px-2 py-1">Attendance</th>
+                <th class="border px-2 py-1">Booklet</th>
+                <th class="border px-2 py-1">Loan #</th>
+                <th class="border px-2 py-1">Amount</th>
+                <th class="border px-2 py-1">Start Date</th>
+                <th class="border px-2 py-1">Outstanding</th>
+                <th class="border px-2 py-1">Arrears</th>
+                <th class="border px-2 py-1">Weekly</th>
+                <th class="border px-2 py-1">Due</th>
+                <th class="border px-2 py-1">Loan Collected</th>
+                <th class="border px-2 py-1">Savings</th>
+                <th class="border px-2 py-1">Total</th>
+                <th class="border px-2 py-1">Source</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${group.members.map((member, mIdx) => {
+                return member.loans.map((loan, lIdx) => `
+                  <tr class="${lIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">
+                    ${lIdx === 0 ? `<td class="border px-2 py-1" rowspan="${member.loans.length}">${member.name}</td>
+                                    <td class="border px-2 py-1" rowspan="${member.loans.length}">${member.attendance}</td>
+                                    <td class="border px-2 py-1" rowspan="${member.loans.length}">${member.booklet}</td>` : ''}
+                    <td class="border px-2 py-1">${loan.number}</td>
+                    <td class="border px-2 py-1">${loan.amount}</td>
+                    <td class="border px-2 py-1">${loan.startDate}</td>
+                    <td class="border px-2 py-1">${loan.outstanding}</td>
+                    <td class="border px-2 py-1">${loan.arrears}</td>
+                    <td class="border px-2 py-1">${loan.weekly}</td>
+                    <td class="border px-2 py-1">${loan.due}</td>
+                    <td class="border px-2 py-1">${loan.loanCollected}</td>
+                    <td class="border px-2 py-1">${loan.savings}</td>
+                    <td class="border px-2 py-1">${loan.total}</td>
+                    <td class="border px-2 py-1">${loan.source}</td>
+                  </tr>
+                `).join('');
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+      container.appendChild(wrapper);
+    });
+  </script>
+</body>
+</html>
